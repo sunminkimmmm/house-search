@@ -55,7 +55,7 @@ public class ReviewRegister extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "리뷰를 입력하세요", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    new ServerConnect((review.getUser_mail()), (review.getUser_review()),(review.getHouse_idx())).execute("http://54.180.79.233:3000/reviewRegister"); //AsyncTask 시작시킴
+                    //new ServerConnect((review.getUser_mail()), (review.getUser_review())).execute("http://54.180.79.233:3000/reviewRegister"); //AsyncTask 시작시킴
                 }
             }
         });

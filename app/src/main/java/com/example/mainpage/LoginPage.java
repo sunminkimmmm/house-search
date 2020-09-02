@@ -1,6 +1,7 @@
 package com.example.mainpage;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -39,7 +40,11 @@ public class LoginPage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_page);
-
+        //로그인 하면 여기 못오고 오너 페이지로
+        if(SaveSharedPreference.getUserName(LoginPage.this).length() != 0){
+            Intent intent = new Intent(LoginPage.this, OwnerMypage.class);
+            startActivity(intent);
+        }
         final Login login = new Login();
 
         joinBtn = (Button) findViewById(R.id.joinButton);
@@ -187,10 +192,16 @@ public class LoginPage extends AppCompatActivity {
                 if(postData.getString("result").equals("1")) {
                     JSONObject data = new JSONObject(postData.getString("data"));
                     Intent intent = new Intent(getApplicationContext(), OwnerMypage.class);
+
+
                     User user = new User(data.getString("userMail"),
                             data.getString("userName"),
                             data.getString("userCheck"));
-                    intent.putExtra("session", user);
+                    SaveSharedPreference.setUserMail(LoginPage.this , user.getUserMail());
+                    SaveSharedPreference.setUserName(LoginPage.this , user.getUserName());
+                    SaveSharedPreference.setUserCheck(LoginPage.this , user.getUserCheck());
+
+//                    intent.putExtra("session", user);
                     startActivity(intent);
                     finish();
                 } else {

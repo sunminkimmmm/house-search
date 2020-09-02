@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -43,12 +44,30 @@ public class MainActivity extends AppCompatActivity {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
 
+
+
         Json.execute(url);
 
         listView = (ListView) findViewById(R.id.listview);
         searchButton = (ImageButton) findViewById(R.id.searchButton);
         loginButton = (Button) findViewById(R.id.loginButton);
         joinButton = (Button) findViewById(R.id.joinButton);
+
+       if(SaveSharedPreference.getUserName(MainActivity.this).length() != 0){
+           if(SaveSharedPreference.getUserCheck(MainActivity.this).equals("1")){
+               loginButton.setText("마이페이지");
+               joinButton.setVisibility(View.INVISIBLE);
+               searchButton.setVisibility(View.INVISIBLE);
+
+           }
+           else{
+               loginButton.setText("마이페이지");
+               joinButton.setVisibility(View.INVISIBLE);
+           }
+
+
+
+        }
 
 
 
@@ -75,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+
 
     }
 
@@ -165,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                     houseList.add(new House(
                             jsonObject.getString("houseIdx"),
-                            R.drawable.house1,
+                            jsonObject.getString("housePic"),
                             jsonObject.getString("housePrice"),
                             jsonObject.getString("houseSpace"),
                             jsonObject.getString("houseComment"),
@@ -180,7 +201,6 @@ public class MainActivity extends AppCompatActivity {
 
                 adapter = new ListViewAdapter(MainActivity.this, R.layout.item, houseList);
                 listView.setAdapter(adapter);
-
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -191,7 +211,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-            } catch (JSONException e) {
+
+            } catch (Exception e) {
+                e.printStackTrace();
 
             }
 

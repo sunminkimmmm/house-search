@@ -2,14 +2,21 @@ package com.example.mainpage;
 
 import android.content.Context;
         import android.content.Intent;
-        import android.view.LayoutInflater;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.util.Log;
+import android.view.LayoutInflater;
         import android.view.View;
         import android.view.ViewGroup;
-        import android.widget.BaseAdapter;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
         import android.widget.ImageView;
-        import android.widget.TextView;
+import android.widget.ListView;
+import android.widget.TextView;
 
-        import java.util.ArrayList;
+import java.io.InputStream;
+import java.util.ArrayList;
 
 public class ListViewAdapter extends BaseAdapter {
 
@@ -31,6 +38,16 @@ public class ListViewAdapter extends BaseAdapter {
     @Override
     public long getItemId(int position){return position;}
 
+   /*listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Intent intent = new Intent(MainActivity.this, DetailHousePage.class);
+            String hIdx = houseList.get(position).getHouseIdx();
+            intent.putExtra("HouseIndex", hIdx);
+            startActivity(intent);
+        }
+    });*/
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
         if(convertView==null){
@@ -38,8 +55,7 @@ public class ListViewAdapter extends BaseAdapter {
         }
 
         House house = data.get(position);
-        ImageView pic=(ImageView)convertView.findViewById(R.id.imageview);
-        pic.setImageResource(house.getHousePic());
+        new DownloadImageTask((ImageView) convertView.findViewById(R.id.imageview)).execute(("http://54.180.79.233:3000/" + house.getHousePic()));
         TextView name1=(TextView)convertView.findViewById(R.id.text1);
         name1.setText("가격 : " + house.getHousePrice());
         TextView name2=(TextView)convertView.findViewById(R.id.text2);
@@ -49,6 +65,31 @@ public class ListViewAdapter extends BaseAdapter {
         TextView name4=(TextView)convertView.findViewById(R.id.text4);
         name4.setText("기타설명 : " + house.getHouseComment());
 
+
         return convertView;
+    }
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
+        }
     }
 }

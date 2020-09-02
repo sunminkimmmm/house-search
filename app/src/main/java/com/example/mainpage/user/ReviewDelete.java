@@ -38,7 +38,7 @@ public class ReviewDelete extends AppCompatActivity {
             public void onClick(View v) {
                 //review.setUser_review(reviewComment.getText().toString());
                 //review.setUser_mail();
-                new ServerConnect((review.getUser_mail()),(review.getUser_review()),(review.getHouse_idx())).execute("http://54.180.79.233:3000/reviewDelete"+review.getHouse_idx()+review.getUser_mail());
+               // new ServerConnect((review.getUser_mail()),(review.getUser_review()),(review.getHouse_idx())).execute("http://54.180.79.233:3000/reviewDelete"+review.getHouse_idx()+review.getUser_mail());
             }
         });
 

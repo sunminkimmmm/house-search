@@ -1,12 +1,15 @@
 package com.example.mainpage;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -29,6 +32,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 public class DetailHousePage extends AppCompatActivity{
 
@@ -37,48 +41,99 @@ public class DetailHousePage extends AppCompatActivity{
     ArrayList<House> houseList = new ArrayList<House>();
     ArrayList<Review> reviewList = new ArrayList<Review>();
 
-    Intent intent;
-
     ReviewAdapter adapter;
     CheckBox goodBtn;
     ImageView imageView;
     TextView price, address, space, comment;
     ListView reviewListView;
-    Button logoutBtn;
+   // Button logoutBtn;
+    Button houseDeleteBtn, houseUpdateBtn;
     ScrollView sv2;
+
+    Bitmap bmImg;
 
     JSONTask3 reviewOutput = new JSONTask3();
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.detail_house);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.detail_house);
 
-            goodBtn = (CheckBox) findViewById(R.id.goodBtn1);
-            imageView = (ImageView) findViewById(R.id.h_image);
-            price = (TextView) findViewById(R.id.price);
-            address = (TextView) findViewById(R.id.address);
-            space = (TextView) findViewById(R.id.space);
-            comment = (TextView) findViewById(R.id.comment);
-            reviewListView = (ListView) findViewById(R.id.reviewListView);
-            logoutBtn = (Button) findViewById(R.id.logoutButton);
-            sv2 = (ScrollView) findViewById(R.id.sv2);
+        goodBtn = (CheckBox) findViewById(R.id.goodBtn1);
+        price = (TextView) findViewById(R.id.price);
+        address = (TextView) findViewById(R.id.address);
+        space = (TextView) findViewById(R.id.space);
+        comment = (TextView) findViewById(R.id.comment);
+        reviewListView = (ListView) findViewById(R.id.reviewListView);
+        //logoutBtn = (Button) findViewById(R.id.logoutButton);
+        sv2 = (ScrollView) findViewById(R.id.sv2);
+        imageView = (ImageView)findViewById(R.id.h_image) ;
 
-            //String houseIdx = intent.getParcelableExtra("HouseIndex");
-            //url = "http://54.180.79.233:3000/houseView/:houseIdx";
-            url = "http://54.180.79.233:3000/recently";
-
-            reviewOutput.execute(url);
+        houseDeleteBtn = (Button)findViewById(R.id.houseDeleteBtn) ;
+        houseUpdateBtn = (Button)findViewById(R.id.houseUpdateBtn);
 
 
-            reviewListView.setOnTouchListener(new View.OnTouchListener() {        //리스트뷰 터취 리스너
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    sv2.requestDisallowInterceptTouchEvent(true);    // 리스트뷰에서 터치가되면 스크롤뷰만 움직이게
-                    return false;
-                }
-            });
+        Intent intent = getIntent();
+        String houseIdx = intent.getStringExtra("HouseIndex");
+        url = "http://54.180.79.233:3000/houseView/" + houseIdx;
+
+
+
+        houseDeleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        houseUpdateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+
+        reviewOutput.execute(url);
+
+        if(SaveSharedPreference.getUserName(DetailHousePage.this).length() != 0){
+            if(SaveSharedPreference.getUserCheck(DetailHousePage.this).equals("1")){
+                goodBtn.setVisibility(View.INVISIBLE);
+
+
+
+            }
+            else {
+                houseDeleteBtn.setVisibility(View.INVISIBLE);
+                houseUpdateBtn.setVisibility(View.INVISIBLE);
+            }
+
+
         }
+
+        if(SaveSharedPreference.getUserName(DetailHousePage.this).length() == 0){
+            goodBtn.setVisibility(View.INVISIBLE);
+            houseDeleteBtn.setVisibility(View.INVISIBLE);
+            houseUpdateBtn.setVisibility(View.INVISIBLE);
+        }
+
+
+
+
+
+        reviewListView.setOnTouchListener(new View.OnTouchListener() {        //리스트뷰 터취 리스너
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                sv2.requestDisallowInterceptTouchEvent(true);    // 리스트뷰에서 터치가되면 스크롤뷰만 움직이게
+                return false;
+            }
+        });
+
+
+
+    }
+
+
     public class JSONTask3 extends AsyncTask<String, String, String> {
 
         @Override
@@ -153,13 +208,15 @@ public class DetailHousePage extends AppCompatActivity{
                 JSONObject getKey= new JSONObject(result);
 
                 //Log.d("jsonObject: ", getKey.getString("data").toString());
-                JSONArray jsonArray1 = new JSONArray(getKey.getString("data").toString());
+                JSONObject jsonObject1 = new JSONObject(getKey.getString("data").toString());
+                JSONArray jsonArray1 = new JSONArray(jsonObject1.getString("house"));
+                JSONArray jsonArray2 = new JSONArray(jsonObject1.getString("review"));
 
                 for(int i =0; i< jsonArray1.length(); i++){
                     JSONObject jsonObject = jsonArray1.getJSONObject(i);
                     houseList.add(new House(
                             jsonObject.getString("houseIdx"),
-                            R.drawable.house1,
+                            jsonObject.getString("housePic"),
                             jsonObject.getString("housePrice"),
                             jsonObject.getString("houseSpace"),
                             jsonObject.getString("houseComment"),
@@ -171,37 +228,60 @@ public class DetailHousePage extends AppCompatActivity{
                     ));
                     Log.d("House" + i + ":", houseList.get(i).toString());
                 }
-
-                /*
-                JSONArray jsonArray2 = new JSONArray(getKey.getString("review").toString());
                 for(int i =0; i< jsonArray2.length(); i++){
                     JSONObject jsonObject = jsonArray2.getJSONObject(i);
                     reviewList.add(new Review(
-                            jsonObject.getString("user_Email"),
-                            jsonObject.getString("review")
+                            jsonObject.getString("userMail"),
+                            jsonObject.getString("reviewComment"),
+                            jsonObject.getString("houseIdx")
+
+
                     ));
                     Log.d("Review" + i + ":", reviewList.get(i).toString());
-                }*/
+                }
 
-                reviewList.add(new Review("ydiosa98", "좋아용!","1"));
-                reviewList.add(new Review("윤다영", "좋아용!!","1"));
-                reviewList.add(new Review("dkgkrltlfgek", "좋아용!!!","1"));
 
                 adapter = new ReviewAdapter(DetailHousePage.this, R.layout.reveiw_list_item, reviewList);
                 reviewListView.setAdapter(adapter);
 
-                imageView.setImageResource(houseList.get(0).getHousePic());
+
+                new DownloadImageTask((ImageView)findViewById(R.id.h_image)).execute(("http://54.180.79.233:3000/" + houseList.get(0).getHousePic()));
                 price.setText(houseList.get(0).getHousePrice());
-                address.setText(houseList.get(0).getHouseAddress1()+" "+houseList.get(0).getHouseAddress2() +" " + houseList.get(0).getHouseAddress3());
+                address.setText(houseList.get(0).getHouseAddress1() + " " + houseList.get(0).getHouseAddress2() + " " + houseList.get(0).getHouseAddress3());
                 space.setText(houseList.get(0).getHouseSpace());
                 comment.setText(houseList.get(0).getHouseComment());
-
-
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
+        }
+
+
+    }
+
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
         }
     }
 }

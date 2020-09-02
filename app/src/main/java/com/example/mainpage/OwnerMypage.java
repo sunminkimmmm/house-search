@@ -34,12 +34,12 @@ public class OwnerMypage extends AppCompatActivity {
 
     String url = "http://54.180.79.233:3000/ownerMyPage/";
     ArrayList<House> houseList = new ArrayList<House>();
-    Session session = new Session();
-    OwnerMypageListViewAdapter adapter;
-    ListView listView;
+
+    ListViewAdapter adapter;
+    ListView listView2;
     TextView ownerName;
     Button logoutButton;
-    ScrollView sv;
+    ScrollView ow;
 
     JSONTask2 Json2 = new JSONTask2();
 
@@ -47,31 +47,45 @@ public class OwnerMypage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.owner_mypage);
-        Intent intent = getIntent();
-        User user = (User) intent.getSerializableExtra("session");
-        Json2.execute(url+user.getUserMail());
-        listView = (ListView) findViewById(R.id.listview2);
+
+
+        listView2 = (ListView) findViewById(R.id.listview2);
         logoutButton = (Button) findViewById(R.id.logoutButton);
         ownerName = (TextView) findViewById(R.id.ownerName);
-        sv = (ScrollView) findViewById(R.id.sv);
+        ow = (ScrollView) findViewById(R.id.ow);
+        Json2.execute(url + SaveSharedPreference.getUserMail(OwnerMypage.this));
+        ow.requestDisallowInterceptTouchEvent(true);
 
-        listView.setOnTouchListener(new View.OnTouchListener() {        //리스트뷰 터취 리스너
+
+
+       /*listView.setOnTouchListener(new View.OnTouchListener() {        //리스트뷰 터취 리스너
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                sv.requestDisallowInterceptTouchEvent(true);    // 리스트뷰에서 터취가되면 스크롤뷰만 움직이게
+                ow.requestDisallowInterceptTouchEvent(true);    // 리스트뷰에서 터취가되면 스크롤뷰만 움직이게
                 return false;
             }
-        });
+        });*/
 
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(OwnerMypage.this, MainActivity.class);
+                SaveSharedPreference.clearUserName(OwnerMypage.this);
                 startActivity(intent);
                 finish();
             }
         });
     }
+
+    @Override
+    public void onBackPressed() {
+        if(SaveSharedPreference.getUserMail(OwnerMypage.this).length() != 0){
+            Intent intent = new Intent(OwnerMypage.this, MainActivity.class);
+            startActivity(intent);
+        }
+        super.onBackPressed();
+    }
+
 
     public class JSONTask2 extends AsyncTask<String, String, String>{
 
@@ -152,7 +166,7 @@ public class OwnerMypage extends AppCompatActivity {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 houseList.add(new House(
                         jsonObject.getString("houseIdx"),
-                        R.drawable.house1,
+                        jsonObject.getString("housePic"),
                         jsonObject.getString("housePrice"),
                         jsonObject.getString("houseSpace"),
                         jsonObject.getString("houseComment"),
@@ -160,15 +174,13 @@ public class OwnerMypage extends AppCompatActivity {
                         jsonObject.getString("houseAddress2"),
                         jsonObject.getString("houseAddress3"),
                         jsonObject.getString("userMail")
-
                 ));
                 Log.d("House" + i + ":", houseList.get(i).toString());
             }
 
-            adapter = new OwnerMypageListViewAdapter(OwnerMypage.this, R.layout.owner_mypage_item, houseList);
-            listView.setAdapter(adapter);
-
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            adapter = new ListViewAdapter(OwnerMypage.this, R.layout.item, houseList);
+            listView2.setAdapter(adapter);
+            listView2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent intent = new Intent(OwnerMypage.this, DetailHousePage.class);
@@ -178,9 +190,13 @@ public class OwnerMypage extends AppCompatActivity {
                 }
             });
 
+
+
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
 
     }
 }

@@ -2,7 +2,7 @@ package com.example.mainpage;
 
 public class House {
     private String houseIdx;
-    private int housePic;
+    private String housePic;
     private String housePrice;
     private String houseSpace;
     private String houseComment;
@@ -14,7 +14,7 @@ public class House {
     public House() {
     }
 
-    public House(String houseIdx, int housePic, String housePrice, String houseSpace, String houseComment, String houseAddress1, String houseAddress2, String houseAddress3, String userMail) {
+    public House(String houseIdx, String housePic, String housePrice, String houseSpace, String houseComment, String houseAddress1, String houseAddress2, String houseAddress3, String userMail) {
         this.houseIdx = houseIdx;
         this.housePic = housePic;
         this.housePrice = housePrice;
@@ -34,11 +34,11 @@ public class House {
         this.houseIdx = houseIdx;
     }
 
-    public int getHousePic() {
+    public String getHousePic() {
         return housePic;
     }
 
-    public void setHousePic(int housePic) {
+    public void setHousePic(String housePic) {
         this.housePic = housePic;
     }
 

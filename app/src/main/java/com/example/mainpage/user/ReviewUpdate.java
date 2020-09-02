@@ -51,7 +51,7 @@ public class ReviewUpdate extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "리뷰를 입력하세요", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    new ReviewUpdate.ServerConnect((review.getUser_mail()), (review.getUser_review()),(review.getHouse_idx())).execute("http://54.180.79.233:3000/reviewUpdate"+review.getHouse_idx()+review.getUser_mail()); //AsyncTask 시작시킴
+                   // new ReviewUpdate.ServerConnect((review.getUser_mail()), (review.getUser_review()),(review.getHouse_idx())).execute("http://54.180.79.233:3000/reviewUpdate"+review.getHouse_idx()+review.getUser_mail()); //AsyncTask 시작시킴
                 }
             }
         });

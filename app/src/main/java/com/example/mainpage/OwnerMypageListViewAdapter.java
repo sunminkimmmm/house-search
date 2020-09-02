@@ -2,6 +2,8 @@ package com.example.mainpage;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -52,35 +54,72 @@ public class OwnerMypageListViewAdapter extends BaseAdapter{
             convertView=inflater.inflate(layout,parent,false);
         }
 
-        final House house = data.get(position);
-        ImageView pic=(ImageView)convertView.findViewById(R.id.imageview);
-        pic.setImageResource(house.getHousePic());
+        House house = data.get(position);
 
-        Button updateBtn = (Button)convertView.findViewById(R.id.updateBtn);
+        house = data.get(position);
+        new DownloadImageTask((ImageView) convertView.findViewById(R.id.imageview)).execute(("http://54.180.79.233:3000/"+ house.getHousePic()));
+        TextView name1=(TextView)convertView.findViewById(R.id.text1);
+        name1.setText("가격 : " + house.getHousePrice());
+        TextView name2=(TextView)convertView.findViewById(R.id.text2);
+        name2.setText("면적 : " +house.getHouseSpace());
+        TextView name3=(TextView)convertView.findViewById(R.id.text3);
+        name3.setText("주소 : " + house.getHouseAddress1()+" "+house.getHouseAddress2()+" "+house.getHouseAddress3());
+        TextView name4=(TextView)convertView.findViewById(R.id.text4);
+        name4.setText("기타설명 : " + house.getHouseComment());
+
+
+
+
+
+        /*Button updateBtn = (Button)convertView.findViewById(R.id.updateBtn);
 
         updateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
             }
-        });
+        });*/
 
-        Button deleteBtn = (Button)convertView.findViewById(R.id.deleteBtn);
+        /*Button deleteBtn = (Button)convertView.findViewById(R.id.deleteBtn);
         deleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String url = "http://54.180.79.233:3000/houseDelete/:" + house.getHouseIdx();
 
-                HouseDelete hd = new HouseDelete();
-                hd.execute(url);
+                //HouseDelete hd = new HouseDelete();
+                //hd.execute(url);
             }
-        });
+        });*/
 
         return convertView;
     }
 
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
 
-    public class HouseDelete extends AsyncTask<String, String, String> {
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
+        }
+    }
+
+    /*public class HouseDelete extends AsyncTask<String, String, String> {
         @Override
         protected String doInBackground(String... urls){
             try {
@@ -130,5 +169,8 @@ public class OwnerMypageListViewAdapter extends BaseAdapter{
             super.onPostExecute(result);
 
         }
-    }
+    }*/
+
+
+
 }
